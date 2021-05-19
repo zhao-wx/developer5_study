@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd 
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd 
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd 
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
+
+	<!--扫描包，让包中的注解生效-->
+	<context:component-scan base-package="com.ck.controller"/>
+	<!--处理springmvc中静态资源的访问问题-->
+	<mvc:default-servlet-handler></mvc:default-servlet-handler>
+	<mvc:annotation-driven></mvc:annotation-driven>
+
+
+	<bean id="resolver" class="org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver">
+		<property name="prefix" value="/WEB-INF/templates/"/>
+		<property name="suffix" value=".html"/>
+		<property name="templateMode" value="HTML5"/>
+		<property name="characterEncoding" value="UTF-8"/>
+	</bean>
+
+	<bean id="engine" class="org.thymeleaf.spring5.SpringTemplateEngine">
+		<property name="templateResolver" ref="resolver"></property>
+	</bean>
+
+	<bean class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
+		<property name="templateEngine" ref="engine"></property>
+		<property name="characterEncoding" value="UTF-8"/>
+	</bean>
+
+
+
+	<context:property-placeholder location="classpath:email.properties"/>
+	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${host}"/>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">${mail_smtp_auth}</prop>
+				<prop key="mail.smtp.timeout">${mail_smtp_timeout}</prop>
+			</props>
+		</property>
+		<property name="username" value="${user_name}"/>
+		<property name="password" value="${user_pwd}"/>
+		<property name="defaultEncoding" value="UTF-8"/>
+	</bean>
+
+	<!--配置springmvc做文件上传的解析器-->
+	<!--该解析器会将上传的文件数据自动解析保存在MultipartFile对象中-->
+	<!--注意：springmvc默认就是通过id="multipartResolver"找文件上传解析器-->
+	<!--因此这里的id要指定为multipartResolver-->
+	<bean id="multipartResolver"
+		  class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+
+</beans>
